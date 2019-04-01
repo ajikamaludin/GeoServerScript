@@ -1,49 +1,41 @@
 #!/bin/bash
 #script for ubuntu 16.04
-#opengeo by boundless
+#mapserver
 
 #update system
 apt update && apt dist-upgrade -y
 
 #set hostname
-hostnamectl set-hostname qmack-opengeo
+hostnamectl set-hostname qmack-mapserver
 
-#install docker
-apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-apt-key fingerprint 0EBFCD88
-add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt update && apt dist-upgrade -y
-apt-get install docker-ce docker-ce-cli containerd.io -y
-
-#build opengeo from docker
-docker volume create aji-geoserver_datadir
-docker run --name "opengeo-aji" -dit -v aji-geoserver_datadir:/var/lib/opengeo/geoserver -p 8080:8080 rikyperdana/ubuntu-opengeo
-docker exec opengeo-aji service postgresql start
-docker exec opengeo-aji service tomcat7 start
-
-#make it automation in reboot : exit rc.local
-sed -i -e '$i \docker container start opengeo-aji &\n' /etc/rc.local
-sed -i -e '$i \docker exec opengeo-aji service postgresql start &\n' /etc/rc.local
-sed -i -e '$i \docker exec opengeo-aji service tomcat7 start &\n' /etc/rc.local
-sed -i -e '$i \docker container start portainer &\n' /etc/rc.local
-
-#install portainer for console 
-docker volume create portainer_data
-docker run --name "portainer" -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+#install mapserver
+apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 314DF160
+apt-key fingerprint 314DF160
+add-apt-repository "deb http://ppa.launchpad.net/ubuntugis/ppa/ubuntu $(lsb_release -cs) main"
+apt-get update
+apt-get install cgi-mapserver mapserver-bin mapserver-doc python-mapscript -y
 
 #install apache2, php5, enable mod_rewrite, changes php.ini
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E5267A6C
 add-apt-repository "deb http://ppa.launchpad.net/ondrej/php/ubuntu $(lsb_release -cs) main "
 apt-get update
-apt-get install apache2 php5.6 php5.6-cli php5.6-common php5.6-curl php5.6-dev php5.6-gd php5.6-imap php5.6-intl php5.6-json php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-pgsql php5.6-phpdbg php5.6-sqlite3 php5.6-sybase php5.6-xml php5.6-xmlrpc php5.6-xsl php5.6-zip libapache2-mod-php5.6 -y
-
-a2enmod rewrite
+apt-get install apache2 php5.6 php5.6-cli php5.6-common php5.6-curl php5.6-dev php5.6-gd php5.6-imap php5.6-intl php5.6-json php5.6-mbstring php5.6-mcrypt php5.6-mysql php5.6-pgsql php5.6-phpdbg php5.6-sqlite3 php5.6-sybase php5.6-xml php5.6-xmlrpc php5.6-xsl php5.6-zip php5.6-fpm libapache2-mod-fastcgi libapache2-mod-php5.6 zip unzip -y
+a2enmod actions cgi fastcgi alias rewrite
 sed -i -e '16i \<Directory /var/www/html> \nOptions Indexes FollowSymlinks MultiViews \nAllowOverride All \nRequire all granted\n </Directory>\n' /etc/apache2/sites-available/000-default.conf
+sed -i -e '16i \<Directory />\nOptions FollowSymLinks \nAllowOverride All \n</Directory> \nScriptAlias /cgi-bin/ /usr/lib/cgi-bin/ \n<Directory /usr/lib/cgi-bin> \nAllowOverride None \nOptions +ExecCGI -MultiViews +SymLinksIfOwnerMatch \nOrder allow,deny \nAllow from all \n</Directory>' /etc/apache2/sites-available/000-default.conf
+
 cp /usr/lib/php/5.6/php.ini-development /etc/php/5.6/apache2/php.ini
 rm /var/www/html/index.html
 echo "<?php phpinfo(); ?>" > /var/www/html/index.php
+chmod o+x /usr/lib/cgi-bin/mapserv
 service apache2 restart
+
+#mapserver demo
+cd /tmp;wget http://maps.dnr.state.mn.us/mapserver_demos/workshop-5.4.zip;
+unzip workshop-5.4.zip -d /var/www/html
+mv /var/www/html/workshop-5.4 /var/www/html/demo
+cd /var/www/html/demo;rm index.html;
+wget https://gist.githubusercontent.com/ajikamaludin/a45643772aa47d9279de879eaa5252c1/raw/3f1f740129b6ae3ddbcd7caf061de1e06007f5fe/index.html
 
 #install postgresql, postgis, phppgadmin
 echo "deb http://apt.postgresql.org/pub/repos/apt xenial-pgdg main" >> /etc/apt/sources.list
