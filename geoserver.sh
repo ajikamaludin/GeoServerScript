@@ -3,7 +3,7 @@
 #geoserver
 
 #update system
-apt update && apt dist-upgrade -y
+apt-get update
 
 #set hostname
 hostnamectl set-hostname qmack-geoserver
@@ -13,7 +13,7 @@ apt-get install apt-transport-https ca-certificates curl gnupg-agent software-pr
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 apt-key fingerprint 0EBFCD88
 add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-apt update && apt dist-upgrade -y
+apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io -y
 
 #build geoserver from docker
@@ -50,6 +50,9 @@ apt-get install postgresql-9.6 postgresql-9.6-postgis-2.4  postgresql-9.6-postgi
 su -c "psql -c 'CREATE EXTENSION adminpack;'" postgres
 su -c "psql -c 'CREATE EXTENSION postgis;'" postgres
 su -c "psql -c \"CREATE USER gisadmin SUPERUSER PASSWORD 'gisadmin';\"" postgres
+
+sed -i "/\#listen/a listen_addresses='*'" /etc/postgresql/11/main/postgresql.conf
+sed -i '$i \host all all 0.0.0.0/0 md5 \n' /etc/postgresql/11/main/pg_hba.conf
 
 cd /tmp;wget https://github.com/phppgadmin/phppgadmin/archive/REL_5-6-0.zip;
 wget https://gist.githubusercontent.com/ajikamaludin/2d1ae989402decad064f4d7d7ce424be/raw/60277bb5064b12e6c42993c4ecf08fd22ff5f969/phppgadmin-config.inc.php;

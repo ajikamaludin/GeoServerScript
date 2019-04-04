@@ -3,7 +3,7 @@
 #mapserver
 
 #update system
-apt update && apt dist-upgrade -y
+apt-get update
 
 #set hostname
 hostnamectl set-hostname qmack-mapserver
