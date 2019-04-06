@@ -1,12 +1,13 @@
 #!/bin/bash
 #script for ubuntu 16.04
+#maintance by aji19kamaludin@gmail.com
 #geoserver
 
 #update system
 apt-get update
 
 #set hostname
-hostnamectl set-hostname qmack-geoserver
+hostnamectl set-hostname gdp-geoserver
 
 #install docker
 apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
@@ -17,11 +18,11 @@ apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io -y
 
 #build geoserver from docker
-docker volume create aji-geoserver_datadir
-docker run --name="geoserver-aji" -p 8080:8080 -v aji-geoserver_datadir:/mnt/geoserver_datadir -d ajikamaludin/geoserver:v1
+docker volume create gdp-geoserver_datadir
+docker run --name="geoserver-gdp" -p 8080:8080 -v gdp-geoserver_datadir:/mnt/geoserver_datadir -d ajikamaludin/geoserver:v1
 
 #make it automation in reboot : exit rc.local
-sed -i -e '$i \docker container start geoserver-aji &\n' /etc/rc.local
+sed -i -e '$i \docker container start geoserver-gdp &\n' /etc/rc.local
 sed -i -e '$i \docker container start portainer &\n' /etc/rc.local
 
 #install portainer for console 

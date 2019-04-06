@@ -1,12 +1,13 @@
 #!/bin/bash
 #script for ubuntu 16.04
+#maintance by aji19kamaludin@gmail.com
 #opengeo by boundless
 
 #update system
 apt-get update
 
 #set hostname
-hostnamectl set-hostname qmack-opengeo
+hostnamectl set-hostname gdp-opengeo
 
 #install docker
 apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
@@ -17,15 +18,15 @@ apt-get update
 apt-get install docker-ce docker-ce-cli containerd.io -y
 
 #build opengeo from docker
-docker volume create aji-geoserver_datadir
-docker run --name "opengeo-aji" -dit -v aji-geoserver_datadir:/var/lib/opengeo/geoserver -p 8080:8080 rikyperdana/ubuntu-opengeo
-docker exec opengeo-aji service postgresql start
-docker exec opengeo-aji service tomcat7 start
+docker volume create gdp-geoserver_datadir
+docker run --name "opengeo-gdp" -dit -v gdp-geoserver_datadir:/var/lib/opengeo/geoserver -p 8080:8080 rikyperdana/ubuntu-opengeo
+docker exec opengeo-gdp service postgresql start
+docker exec opengeo-gdp service tomcat7 start
 
 #make it automation in reboot : exit rc.local
-sed -i -e '$i \docker container start opengeo-aji &\n' /etc/rc.local
-sed -i -e '$i \docker exec opengeo-aji service postgresql start &\n' /etc/rc.local
-sed -i -e '$i \docker exec opengeo-aji service tomcat7 start &\n' /etc/rc.local
+sed -i -e '$i \docker container start opengeo-gdp &\n' /etc/rc.local
+sed -i -e '$i \docker exec opengeo-gdp service postgresql start &\n' /etc/rc.local
+sed -i -e '$i \docker exec opengeo-gdp service tomcat7 start &\n' /etc/rc.local
 sed -i -e '$i \docker container start portainer &\n' /etc/rc.local
 
 #install portainer for console 

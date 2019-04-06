@@ -1,12 +1,13 @@
 #!/bin/bash
 #script for ubuntu 16.04
+#maintance by aji19kamaludin@gmail.com
 #mapserver
 
 #update system
 apt-get update
 
 #set hostname
-hostnamectl set-hostname qmack-mapserver
+hostnamectl set-hostname gdp-mapserver
 
 #install mapserver
 apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 314DF160

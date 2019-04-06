@@ -1,12 +1,13 @@
 #!/bin/bash
 #script for ubuntu 16.04
+#maintance by aji19kamaludin@gmail.com
 #geoserver
 
 #update system
 apt-get update
 
 #set hostname
-hostnamectl set-hostname qmack-geonode
+hostnamectl set-hostname gdp-geonode
 
 #install docker
 apt-get install apt-transport-https ca-certificates curl gnupg-agent software-properties-common -y
@@ -28,7 +29,7 @@ cd geonode
 export IP_PUBLIC=$(curl ifconfig.me);docker-compose up -d --build
 
 #make it automation in reboot : exit rc.local
-# sed -i -e '$i \export IP_PUBLIC=$(curl ifconfig.me);cd /root/geonode;docker-compose -f docker-compose.yml up -d --build &\n' /etc/rc.local
+sed -i -e '$i \export IP_PUBLIC=$(curl ifconfig.me);cd /root/geonode;docker-compose -f docker-compose.yml up -d --build &\n' /etc/rc.local
 sed -i -e '$i \docker container start portainer &\n' /etc/rc.local
 
 #install portainer for console 
