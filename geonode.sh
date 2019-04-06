@@ -23,12 +23,12 @@ docker-compose --version
 
 #build geonode from docker-compose orchestra
 cd /root 
-git clone https://github.com/GeoNode/geonode.git
+git clone https://github.com/ajikamaludin/geonode.git
 cd geonode
-docker-compose up -d --build
+export IP_PUBLIC=$(curl ifconfig.me);docker-compose up -d --build
 
 #make it automation in reboot : exit rc.local
-sed -i -e '$i \cd /root/geonode;docker-compose -f docker-compose.yml up -d --build &\n' /etc/rc.local
+# sed -i -e '$i \export IP_PUBLIC=$(curl ifconfig.me);cd /root/geonode;docker-compose -f docker-compose.yml up -d --build &\n' /etc/rc.local
 sed -i -e '$i \docker container start portainer &\n' /etc/rc.local
 
 #install portainer for console 
